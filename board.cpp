@@ -133,7 +133,7 @@ char move(BOARDSTATE &board, char* inp_coords, bool up, bool right){
     char* coords_tmp = coords(r, c, up, right, false);
     char* coords_cap = coords(r, c, up, right, true);
     if(getinbounds(board.board, coords_tmp) == 0) {
-        if (coords_tmp[0] == 8 * up) {
+        if (coords_tmp[0] == 7 * up) {
             setinbounds(board, coords_tmp, promotions[board.board[r][c]]);
             endtype = promotions[board.board[r][c]];
         } else {
@@ -141,7 +141,7 @@ char move(BOARDSTATE &board, char* inp_coords, bool up, bool right){
         }
     } else {
 
-        if (coords_cap[0] == 8 * up) {
+        if (coords_cap[0] == 7 * up) {
             setinbounds(board, coords_cap, promotions[board.board[r][c]]);
             endtype = promotions[board.board[r][c]];
         } else {

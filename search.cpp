@@ -18,6 +18,17 @@ bool hasking(BOARDSTATE board){
     return false;
 }
 
+bool hasking(BOARDSTATE board, char side){
+    for(int r = 0; r < 8; r++){
+        for(int c = 0; c < 8; c++){
+            if(board.board[r][c] == side){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool wrongsquare(BOARDSTATE board){
     for(int r = 0; r < 8; r++) {
         for (int c = 0; c < 8; c++) {
@@ -56,6 +67,18 @@ bool kingnotonlastrank(BOARDSTATE board){
     return false;
 }
 
+bool promotefailed(BOARDSTATE board){
+    for(int c = 0; c < 8; c++){
+        if(board.board[0][c] == 3){
+            return true;
+        }
+        if(board.board[8][c] == 1){
+            return true;
+        }
+    }
+    return false;
+}
+
 char testpos[8][8] =  {{1, 0, 1, 0, 1, 0, 1, 0},
                        {0, 1, 0, 1, 0, 1, 0, 1},
                        {0, 0, 1, 0, 1, 0, 1, 0},
@@ -76,6 +99,15 @@ bool boardequal(char pos1[8][8], char pos2[8][8]){
     return true;
 }
 
+bool pieceonrank(BOARDSTATE board, char piece, char rank){
+    for(int c = 0; c < 8; c++){
+        if(board.board[rank][c] == piece){
+            return true;
+        }
+    }
+    return false;
+}
+
 int perft(Board b, int depth){
     if(depth <= 0){
 //        if(wrongsquare(b.board)){
@@ -91,17 +123,10 @@ int perft(Board b, int depth){
 //    }
     for(BOARDSTATE state : moves){
         b.board = state;
-        int val = perft(b, depth - 1);
-        result += val;
-//        if(depth == 2 && state.sidetomove == 1){
-//            std::cout << b.print() << std::endl;
-//            std::cout << val << std::endl;
-//
-//        }
-        if(hasking(state) && depth==2){
+        if(pieceonrank(state, 1, 7)){
             char* crash = NULL;
             std::cout << printstate(state) << std::endl;
-            std::cout << "reached from (ply " << state.ply << ") " << val << std::endl;
+            std::cout << "reached from (ply " << state.ply << ") " << std::endl;
             std::cout << printstate(oldstate) << std::endl;
             std::vector<BOARDSTATE> moves = legalmovesstate(oldstate);
             for(BOARDSTATE s : moves){
@@ -109,6 +134,15 @@ int perft(Board b, int depth){
             }
             std::cout << *crash << std::endl;
         }
+
+        int val = perft(b, depth - 1);
+        result += val;
+//        if(depth == 2 && state.sidetomove == 1){
+//            std::cout << b.print() << std::endl;
+//            std::cout << val << std::endl;
+//
+//        }
+
         b.board = oldstate;
 
     }
