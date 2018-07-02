@@ -357,7 +357,6 @@ std::vector<BOARDSTATE> piecemoves(BOARDSTATE board, char r, char c, bool onlyca
                 char* currentcoords = new char[2]{r, c};
                 bool promoted = move(tmp, currentcoords, up, right);
                 delete [] currentcoords;
-                tmp.ply = board.ply;
                 if (!promoted) {
                     char* newcoords = coords(r, c, i, true);
                     std::vector<BOARDSTATE> tree = capturetree(tmp, newcoords);

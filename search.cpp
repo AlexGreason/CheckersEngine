@@ -75,7 +75,7 @@ std::vector<BOARDSTATE> minimax(BOARDSTATE start, int depth){
             best = val;
             bestpv = tmppv;
         } else {
-
+            tmppv.clear();
         }
     }
     start.eval = materiel1(start);
