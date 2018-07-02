@@ -6,107 +6,8 @@
 #include <sstream>
 #include "search.h"
 #include "board.h"
+#include "eval.h"
 
-bool hasking(BOARDSTATE board){
-    for(int r = 0; r < 8; r++){
-        for(int c = 0; c < 8; c++){
-            if(board.board[r][c] == 2 || board.board[r][c] == 4){
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool hasking(BOARDSTATE board, char side){
-    for(int r = 0; r < 8; r++){
-        for(int c = 0; c < 8; c++){
-            if(board.board[r][c] == side){
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool wrongsquare(BOARDSTATE board){
-    for(int r = 0; r < 8; r++) {
-        for (int c = 0; c < 8; c++) {
-            if((r + c)%2 == 1){
-                if(board.board[r][c] != 0){
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-bool kingmoved(BOARDSTATE board, BOARDSTATE oldboard){
-    if(!hasking(oldboard)){
-        return false;
-    }
-    for(int r = 0; r < 8; r++) {
-        for (int c = 0; c < 8; c++) {
-            if ((board.board[r][c] == 2 || board.board[r][c] == 4) && board.board[r][c] != oldboard.board[r][c]) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool kingnotonlastrank(BOARDSTATE board){
-    for(int r = 1; r < 7; r++) {
-        for (int c = 0; c < 8; c++) {
-            if(board.board[r][c] == 2 || board.board[r][c] == 4){
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool promotefailed(BOARDSTATE board){
-    for(int c = 0; c < 8; c++){
-        if(board.board[0][c] == 3){
-            return true;
-        }
-        if(board.board[8][c] == 1){
-            return true;
-        }
-    }
-    return false;
-}
-
-char testpos[8][8] =  {{1, 0, 1, 0, 1, 0, 1, 0},
-                       {0, 1, 0, 1, 0, 1, 0, 1},
-                       {0, 0, 1, 0, 1, 0, 1, 0},
-                       {0, 0, 0, 0, 0, 0, 0, 0},
-                       {0, 0, 0, 0, 0, 0, 0, 0},
-                       {0, 3, 0, 1, 0, 3, 0, 3},
-                       {3, 0, 3, 0, 3, 0, 3, 0},
-                       {0, 3, 0, 3, 0, 3, 0, 3}};
-
-bool boardequal(char pos1[8][8], char pos2[8][8]){
-    for(int r = 0; r < 8; r++){
-        for(int c = 0; c < 8; c++){
-            if(pos1[r][c] != pos2[r][c]){
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-bool pieceonrank(BOARDSTATE board, char piece, char rank){
-    for(int c = 0; c < 8; c++){
-        if(board.board[rank][c] == piece){
-            return true;
-        }
-    }
-    return false;
-}
 
 int perft(Board b, int depth){
     if(depth <= 0){
@@ -147,4 +48,45 @@ int perft(Board b, int depth){
 
     }
     return result;
+}
+
+std::vector<BOARDSTATE> minimax(BOARDSTATE start, int depth){
+    std::vector<BOARDSTATE> pv;
+    if(depth == 0){
+        start.eval = materiel1(start);
+        if(start.eval >= 4){
+            start.eval = materiel1(start);
+        }
+        pv.insert(pv.begin(), start);
+        return pv;
+    }
+    std::vector<BOARDSTATE> moves = legalmovesstate(start);
+    double best = -10000;
+    std::vector<BOARDSTATE> bestpv;
+    if(start.sidetomove == 1){
+        best = 10000;
+    }
+    for(BOARDSTATE state : moves){
+        std::vector<BOARDSTATE> tmppv = minimax(state, depth - 1);
+        double val = tmppv.back().eval;
+        if((val > best && !start.sidetomove) || (val < best && start.sidetomove)){
+            best = val;
+            bestpv = tmppv;
+        } else {
+
+        }
+    }
+    start.eval = materiel1(start);
+    bestpv.insert(bestpv.begin(), start);
+    return bestpv;
+}
+
+BOARDSTATE minimaxagent(BOARDSTATE start, int depth){
+    return minimax(start, depth).front();
+}
+
+BOARDSTATE randomagent(BOARDSTATE start){
+    std::vector<BOARDSTATE> moves = legalmovesstate(start);
+    long index = random();
+    return moves[index];
 }

@@ -9,4 +9,5 @@
 #include "board.h"
 
 int perft(Board b, int depth);
+std::vector<BOARDSTATE> minimax(BOARDSTATE start, int depth);
 #endif //CHECKERSENGINE_SEARCH_H

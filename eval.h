@@ -5,4 +5,9 @@
 #ifndef CHECKERSENGINE_EVAL_H
 #define CHECKERSENGINE_EVAL_H
 
+#include "board.h"
+
+bool pieceonrank(BOARDSTATE board, char piece, char rank);
+double materiel1(BOARDSTATE board);
+
 #endif //CHECKERSENGINE_EVAL_H

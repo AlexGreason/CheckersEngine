@@ -23,7 +23,11 @@ int main() {
     //b.board.sidetomove = 1;
     //std::cout << b.print() << std::endl;
     b.startpos();
-    std::cout << perft(b, 10) << std::endl;
+//    std::vector<BOARDSTATE> pv = minimax(b.board, 9);
+//    for(BOARDSTATE state : pv){
+//        std::cout << printstate(state) << state.eval << std::endl;
+//    }
+    std::cout << perft(b, 9) << std::endl;
 //    std::cout << b.print() << std::endl;
 //    move(b.board, 2, 0, 1, 1);
 //    std::cout << b.print() << std::endl;

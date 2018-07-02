@@ -15,12 +15,13 @@ struct BOARDSTATE {
     char sidetomove; //0=first player (black), 1=second player(red)
     char result; //0=not terminal, 1=first player win, 2 = second player win, 3=draw
     char board[8][8]; //0=empty, 1=black piece, 2=black king, 3=red piece, 4=red king
+    double eval;
 };
 
 char move(BOARDSTATE &board, char r, char c, bool right, bool up);
 char* hascaptures(BOARDSTATE board, char r, char c);
 char* hasmoves(BOARDSTATE board, char r, char c);
-std::vector<BOARDSTATE> legalmovesstate(BOARDSTATE board);
+std::vector<BOARDSTATE> legalmovesstate(BOARDSTATE &board);
 
 struct MOVE {
     char startr;
@@ -34,7 +35,6 @@ std::string printstate(BOARDSTATE board);
 class Board{
 public:
     BOARDSTATE board;
-    double eval;
     void startpos();
     std::string print();
     std::vector<BOARDSTATE> legalmoves();
