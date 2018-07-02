@@ -22,17 +22,19 @@ int perft(Board b, int depth){
 //    if(depth == 1){
 //        return (int)moves.size();
 //    }
-    for(BOARDSTATE state : moves){
+    for(int i = 0; i < moves.size(); i++){
+        BOARDSTATE state = moves[i];
         b.board = state;
-        if(pieceonrank(state, 1, 7)){
+        if(false){
             char* crash = NULL;
             std::cout << printstate(state) << std::endl;
-            std::cout << "reached from (ply " << state.ply << ") " << std::endl;
+            std::cout << "versus (ply " << state.ply << ") " << std::endl;
             std::cout << printstate(oldstate) << std::endl;
             std::vector<BOARDSTATE> moves = legalmovesstate(oldstate);
             for(BOARDSTATE s : moves){
                 std::cout << printstate(s) << std::endl;
             }
+            moves = legalmovesstate(oldstate);
             std::cout << *crash << std::endl;
         }
 

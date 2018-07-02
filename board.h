@@ -21,7 +21,9 @@ struct BOARDSTATE {
 char move(BOARDSTATE &board, char r, char c, bool right, bool up);
 char* hascaptures(BOARDSTATE board, char r, char c);
 char* hasmoves(BOARDSTATE board, char r, char c);
-std::vector<BOARDSTATE> legalmovesstate(BOARDSTATE &board);
+std::vector<BOARDSTATE> legalmovesstate(BOARDSTATE board);
+std::vector<BOARDSTATE> legalmovesstate_old(BOARDSTATE board);
+bool equalstates(BOARDSTATE board1, BOARDSTATE board2);
 
 struct MOVE {
     char startr;
@@ -38,7 +40,6 @@ public:
     void startpos();
     std::string print();
     std::vector<BOARDSTATE> legalmoves();
-
     void testpos();
 };
 
