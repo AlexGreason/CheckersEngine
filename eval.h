@@ -9,5 +9,6 @@
 
 bool pieceonrank(BOARDSTATE board, char piece, char rank);
 double materiel1(BOARDSTATE board);
+double evaluate(BOARDSTATE board);
 
 #endif //CHECKERSENGINE_EVAL_H

@@ -1,7 +1,9 @@
 #include <iostream>
 #include <sstream>
+#include <unordered_map>
 #include "board.h"
 #include "search.h"
+#include "game.h"
 
 std::string printarray(char array[], int len){
     std::stringstream val;
@@ -18,16 +20,20 @@ std::string printarray(char array[], int len){
 }
 
 int main() {
+    rungame(currydepth(minimaxagent, 9), currydepth(minimaxagent, 10));
     Board b{};
     //b.testpos();
     //b.board.sidetomove = 1;
     //std::cout << b.print() << std::endl;
-    b.startpos();
-//    std::vector<BOARDSTATE> pv = minimax(b.board, 10);
+//    b.startpos();
+//    std::unordered_map<BOARDSTATE, double> transtable;
+//    std::vector<BOARDSTATE> pv;
+//    pv = minimax_caching(b.board, 10, transtable);
+//    std::cout << transtable.size() << std::endl;
 //    for(BOARDSTATE state : pv){
-   //     std::cout << printstate(state) << state.eval << std::endl;
- //   }
-    std::cout << perft(b, 12) << std::endl;
+//        std::cout << printstate(state) << state.eval << std::endl;
+//    }
+ //   std::cout << perft(b, 10) << std::endl;
 //    std::cout << b.print() << std::endl;
 //    move(b.board, 2, 0, 1, 1);
 //    std::cout << b.print() << std::endl;

@@ -106,9 +106,10 @@ bool pieceonrank(BOARDSTATE board, char piece, char rank){
     return false;
 }
 
-char* countpieces(BOARDSTATE board){
-    char* counts;
-    counts = new char[6]{0, 0, 0, 0, 0, 0};
+
+std::vector<char> countpieces(BOARDSTATE board){
+    std::vector<char> counts;
+    counts.resize(6);
     for(int r = 0; r < 8; r++){
         for(int c = 0; c < 8; c++){
             counts[board.board[r][c]]++;
@@ -119,13 +120,16 @@ char* countpieces(BOARDSTATE board){
 
 double materiel1(BOARDSTATE board){
     if(board.result != 0){
-        double vals[4]{0, 100000, -100000, 0};
+        double vals[4]{0, 1000, -1000, 0};
         return vals[board.result];
     }
     double kingval = 5;
-    char* counts;
-    counts = countpieces(board);
+    std::vector<char> counts = countpieces(board);
     double black = counts[1] + kingval * counts[2];
     double red = counts[3] + kingval * counts[4];
     return black - red;
+}
+
+double evaluate(BOARDSTATE board){
+    return materiel1(board);
 }

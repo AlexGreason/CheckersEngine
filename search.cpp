@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <unordered_map>
 #include "search.h"
 #include "board.h"
 #include "eval.h"
@@ -55,9 +56,9 @@ int perft(Board b, int depth){
 std::vector<BOARDSTATE> minimax(BOARDSTATE start, int depth){
     std::vector<BOARDSTATE> pv;
     if(depth == 0){
-        start.eval = materiel1(start);
+        start.eval = evaluate(start);
         if(start.eval >= 4){
-            start.eval = materiel1(start);
+            start.eval = evaluate(start);
         }
         pv.insert(pv.begin(), start);
         return pv;
@@ -76,19 +77,76 @@ std::vector<BOARDSTATE> minimax(BOARDSTATE start, int depth){
             bestpv = tmppv;
         } else {
             tmppv.clear();
+            tmppv.shrink_to_fit();
         }
     }
-    start.eval = materiel1(start);
+    start.eval = evaluate(start);
     bestpv.insert(bestpv.begin(), start);
     return bestpv;
 }
 
+std::vector<BOARDSTATE> minimax_caching(BOARDSTATE start, int depth, std::unordered_map<BOARDSTATE, double> &transtable){
+    std::vector<BOARDSTATE> pv;
+    auto tableeval = transtable.find(start);
+    if(tableeval != transtable.end()){
+        start.eval = tableeval->second;
+        pv.insert(pv.begin(), start);
+        return pv;
+    }
+    if(depth == 0){
+        start.eval = evaluate(start);
+        if(start.eval >= 4){
+            start.eval = evaluate(start);
+        }
+        transtable.insert({start, start.eval});
+        pv.insert(pv.begin(), start);
+        return pv;
+    }
+    std::vector<BOARDSTATE> moves = legalmovesstate(start);
+    double best = -10000;
+    std::vector<BOARDSTATE> bestpv;
+    if(start.sidetomove == 1){
+        best = 10000;
+    }
+    for(BOARDSTATE state : moves){
+        std::vector<BOARDSTATE> tmppv = minimax_caching(state, depth - 1, transtable);
+        double val = tmppv.back().eval;
+        if((val > best && !start.sidetomove) || (val < best && start.sidetomove)){
+            best = val;
+            bestpv = tmppv;
+        } else {
+            tmppv.clear();
+            tmppv.shrink_to_fit();
+        }
+    }
+    if(bestpv.size() > 0){
+        transtable.insert({start, bestpv.back().eval});
+    } else {
+        transtable.insert({start, best});
+    }
+
+    start.eval = evaluate(start);
+    bestpv.insert(bestpv.begin(), start);
+    return bestpv;
+}
+
+
 BOARDSTATE minimaxagent(BOARDSTATE start, int depth){
-    return minimax(start, depth).front();
+    std::unordered_map<BOARDSTATE, double> transtable;
+    std::vector<BOARDSTATE> pv = minimax_caching(start, depth, transtable);
+    transtable.clear();
+    if(pv.size() > 1){
+        return pv[1];
+    } else {
+        return pv[0];
+    }
 }
 
 BOARDSTATE randomagent(BOARDSTATE start){
     std::vector<BOARDSTATE> moves = legalmovesstate(start);
-    long index = random();
+    if(moves.size() == 0){
+        return start;
+    }
+    long index = random() * moves.size();
     return moves[index];
 }
