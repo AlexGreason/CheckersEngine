@@ -9,6 +9,7 @@
 #include "search.h"
 #include "board.h"
 #include "eval.h"
+#include "engine.h"
 
 
 
@@ -85,7 +86,7 @@ std::vector<BOARDSTATE> minimax(BOARDSTATE start, int depth, ENGINEPARAMS params
 }
 
 std::vector<BOARDSTATE>
-minimax_caching(BOARDSTATE start, int depth, double (*eval)(BOARDSTATE, ENGINEPARAMS), ENGINEPARAMS params,
+minimax_caching(BOARDSTATE start, Engine engine, int depth,
                 std::unordered_map<BOARDSTATE, double> &transtable) {
     std::vector<BOARDSTATE> pv;
     auto tableeval = transtable.find(start);
@@ -95,7 +96,7 @@ minimax_caching(BOARDSTATE start, int depth, double (*eval)(BOARDSTATE, ENGINEPA
         return pv;
     }
     if(depth == 0){
-        start.eval = eval(start, params);
+        start.eval = engine.eval(start);
         transtable.insert({start, start.eval});
         pv.insert(pv.begin(), start);
         return pv;
@@ -107,7 +108,7 @@ minimax_caching(BOARDSTATE start, int depth, double (*eval)(BOARDSTATE, ENGINEPA
         best = 10000;
     }
     for(BOARDSTATE state : moves){
-        std::vector<BOARDSTATE> tmppv = minimax_caching(state, depth - 1, eval, params, transtable);
+        std::vector<BOARDSTATE> tmppv = minimax_caching(state, engine, depth - 1, transtable);
         double val = tmppv.back().eval;
         if((val > best && !start.sidetomove) || (val < best && start.sidetomove)){
             best = val;
@@ -117,35 +118,21 @@ minimax_caching(BOARDSTATE start, int depth, double (*eval)(BOARDSTATE, ENGINEPA
             tmppv.shrink_to_fit();
         }
     }
-    if(bestpv.size() > 0){
+    if(!bestpv.empty()){
         transtable.insert({start, bestpv.back().eval});
     } else {
         transtable.insert({start, best});
     }
 
-    start.eval = eval(start, params);
+    start.eval = engine.eval(start);
     bestpv.insert(bestpv.begin(), start);
     return bestpv;
 }
 
-BOARDSTATE minimaxagent(BOARDSTATE start, double (*eval)(BOARDSTATE, ENGINEPARAMS), ENGINEPARAMS params){
-    std::vector<BOARDSTATE> moves = legalmovesstate(start);
-    if(moves.size() == 1){
-      return moves[0];
-    }
-    std::unordered_map<BOARDSTATE, double> transtable;
-    std::vector<BOARDSTATE> pv = minimax_caching(start, params.depth, eval, params, transtable);
-    transtable.clear();
-    if(pv.size() > 1){
-        return pv[1];
-    } else {
-        return pv[0];
-    }
-}
 
 BOARDSTATE randomagent(BOARDSTATE start, ENGINEPARAMS params){
     std::vector<BOARDSTATE> moves = legalmovesstate(start);
-    if(moves.size() == 0){
+    if(moves.empty()){
         return start;
     }
     long index = random() * moves.size();

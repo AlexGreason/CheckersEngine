@@ -6,6 +6,7 @@
 #include "search.h"
 #include "game.h"
 #include "eval.h"
+#include "engine.h"
 
 std::string printarray(char array[], int len){
     std::stringstream val;
@@ -22,10 +23,12 @@ std::string printarray(char array[], int len){
 }
 
 int main() {
-    ENGINEPARAMS p1{11, 1};
-    ENGINEPARAMS p2{11, 1.5};
-    std::cout << std::to_string(p1.depth) << " " << std::to_string(p2.depth) << std::endl;
-    rungame(curryparams(minimaxagent, materiel1, p1), curryparams(minimaxagent, materiel1, p2));
+    ENGINEPARAMS c1{11, 1};
+    ENGINEPARAMS c2{11, 1.5};
+    Engine p1{minimax_caching, materiel1, c1};
+    Engine p2{minimax_caching, materiel1, c2};
+    std::cout << std::to_string(c1.depth) << " " << std::to_string(c2.depth) << std::endl;
+    rungame(p1, p2);
 //    Board b{};
     //b.testpos();
     //b.board.sidetomove = 1;
