@@ -15,43 +15,17 @@
 
 int perft(Board b, int depth){
     if(depth <= 0){
-//        if(wrongsquare(b.board)){
-//            std::cout << b.print() << std::endl;
-//        }
         return 1;
     }
     int result = 0;
     std::vector<BOARDSTATE> moves = b.legalmoves();
     BOARDSTATE oldstate = b.board;
-//    if(depth == 1){
-//        return (int)moves.size();
-//    }
     for(int i = 0; i < moves.size(); i++){
         BOARDSTATE state = moves[i];
         b.board = state;
-        if(false){
-            char* crash = NULL;
-            std::cout << printstate(state) << std::endl;
-            std::cout << "versus (ply " << state.ply << ") " << std::endl;
-            std::cout << printstate(oldstate) << std::endl;
-            std::vector<BOARDSTATE> moves = legalmovesstate(oldstate);
-            for(BOARDSTATE s : moves){
-                std::cout << printstate(s) << std::endl;
-            }
-            moves = legalmovesstate(oldstate);
-            std::cout << *crash << std::endl;
-        }
-
         int val = perft(b, depth - 1);
         result += val;
-//        if(depth == 2 && state.sidetomove == 1){
-//            std::cout << b.print() << std::endl;
-//            std::cout << val << std::endl;
-//
-//        }
-
         b.board = oldstate;
-
     }
     return result;
 }
