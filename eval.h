@@ -6,9 +6,10 @@
 #define CHECKERSENGINE_EVAL_H
 
 #include "board.h"
+#include "search.h"
 
 bool pieceonrank(BOARDSTATE board, char piece, char rank);
-double materiel1(BOARDSTATE board);
-double evaluate(BOARDSTATE board);
+double materiel1(BOARDSTATE board, ENGINEPARAMS params);
+double evaluate(BOARDSTATE board, ENGINEPARAMS params);
 
 #endif //CHECKERSENGINE_EVAL_H

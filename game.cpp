@@ -10,9 +10,9 @@
 #include "eval.h"
 #include "search.h"
 
-//BOARDSTATE (*currydepth(BOARDSTATE (*engine)(BOARDSTATE board, int depth), int depth))(BOARDSTATE){
-std::function<BOARDSTATE(BOARDSTATE)> currydepth(BOARDSTATE (*engine)(BOARDSTATE, int), int depth){
-        return [depth, engine](BOARDSTATE state){return engine(state, depth);};
+//BOARDSTATE (*curryparams(BOARDSTATE (*engine)(BOARDSTATE board, int depth), int depth))(BOARDSTATE){
+std::function<BOARDSTATE(BOARDSTATE)> curryparams(BOARDSTATE (*engine)(BOARDSTATE, double (*)(BOARDSTATE, ENGINEPARAMS), ENGINEPARAMS), double(*eval)(BOARDSTATE, ENGINEPARAMS), ENGINEPARAMS params){
+        return [params, eval, engine](BOARDSTATE state){return engine(state, eval, params);};
 }
 
 char rungame(std::function<BOARDSTATE(BOARDSTATE)> engine1, std::function<BOARDSTATE(BOARDSTATE)> engine2){
