@@ -58,8 +58,7 @@ std::vector<BOARDSTATE> minimax(BOARDSTATE start, int depth, ENGINEPARAMS params
     return bestpv;
 }
 
-std::vector<BOARDSTATE>
-minimax_caching(BOARDSTATE start, Engine engine, int depth,
+std::vector<BOARDSTATE> minimax_caching(BOARDSTATE start, Engine engine, int depth,
                 std::unordered_map<BOARDSTATE, double> &transtable) {
     std::vector<BOARDSTATE> pv;
     auto tableeval = transtable.find(start);
@@ -102,10 +101,50 @@ minimax_caching(BOARDSTATE start, Engine engine, int depth,
     return bestpv;
 }
 
-TTABLE_ENTRY
-alphabeta(BOARDSTATE start, Engine engine, int depth, double alpha, double beta, std::unordered_map<BOARDSTATE, TTABLE_ENTRY> &transtable){
+TTABLE_ENTRY  alphabeta(BOARDSTATE start, Engine engine, int depth, double alpha, double beta,
+                        std::unordered_map<BOARDSTATE, TTABLE_ENTRY> &transtable){
+    struct std::hash<BOARDSTATE> hasher;
+    start.hash = hasher(start);
+    TTABLE_ENTRY result;
+    result.nodes = 1;
+
+    if(depth == 0){
+        result.eval = engine.eval(start);
+        result.pv.insert(result.pv.begin(), start);
+        //transtable.insert({start, result});
+        return result;
+    }
+    auto tableeval = transtable.find(start);
+    if(tableeval != transtable.end()){
+        result = tableeval->second;
+        return result;
+    }
+    std::vector<BOARDSTATE> moves = legalmovesstate(start);
+    std::vector<BOARDSTATE> bestpv;
+    bestpv.insert(bestpv.begin(), moves[0]);
+    for(BOARDSTATE state : moves){
+        TTABLE_ENTRY res = alphabeta(state, engine, depth - 1, -beta, -alpha, transtable);
+        res.eval *= -1;
+        result.nodes += res.nodes;
+        if(res.eval > alpha){
+            bestpv = std::vector<BOARDSTATE>(res.pv);
+            bestpv.insert(bestpv.begin(), start);
+            alpha = res.eval;
+        }
+        if(alpha >= beta){
+            result.eval = beta;
+            result.pv = bestpv;
+            transtable.insert({start, result});
+            return result;
+        }
+    }
+    result.pv = bestpv;
+    result.eval = alpha;
+    transtable.insert({start, result});
+    return result;
 
 }
+
 
 
 BOARDSTATE randomagent(BOARDSTATE start, ENGINEPARAMS params){

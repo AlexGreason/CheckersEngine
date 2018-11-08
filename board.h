@@ -17,8 +17,8 @@ struct BOARDSTATE {
     char result = 0; //0=not terminal, 1=first player win, 2 = second player win, 3=draw
     char board[8][8]{}; //0=empty, 1=black piece, 2=black king, 3=red piece, 4=red king
     double staticeval = 0;
-    std::vector<double> searcheval;
     int nocaptureply = 0;
+    size_t hash = 0;
     inline bool operator==(const BOARDSTATE& other) const {
         // bool comparison = result of comparing 'this' to 'other'
         return equalstates_void((void*)this, (void*)&other);
@@ -27,7 +27,7 @@ struct BOARDSTATE {
 
 
 char move(BOARDSTATE &board, char r, char c, bool right, bool up);
-std::vector<char> hascaptures(BOARDSTATE board, char r, char c);
+char* hascaptures(BOARDSTATE board, char r, char c);
 char* hasmoves(BOARDSTATE board, char r, char c);
 std::vector<BOARDSTATE> legalmovesstate(BOARDSTATE &board);
 bool equalstates(BOARDSTATE board1, BOARDSTATE board2);
@@ -74,6 +74,9 @@ namespace std {
     template<>
     struct hash<BOARDSTATE> {
         inline size_t operator()(const BOARDSTATE& x) const {
+            if(x.hash != 0){
+                return x.hash;
+            }
             size_t value = 0;
             std::hash<std::array<char, 64>> boardhash;
             std::array<char, 64> boardarray{};

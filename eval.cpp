@@ -110,8 +110,7 @@ bool pieceonrank(BOARDSTATE board, char piece, char rank){
 
 
 std::vector<char> countpieces(BOARDSTATE board){
-    std::vector<char> counts;
-    counts.resize(6);
+    std::vector<char> counts(6);
     for (auto &r : board.board) {
         for(int c = 0; c < 8; c++){
             counts[r[c]]++;

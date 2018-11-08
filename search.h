@@ -11,17 +11,20 @@
 #include "board.h"
 #include "engine.h"
 
-
-
-int perft(Board b, int depth);
-std::vector<BOARDSTATE> minimax(BOARDSTATE start, int depth, ENGINEPARAMS params);
-std::vector<BOARDSTATE>
-minimax_caching(BOARDSTATE start, Engine engine, int depth,
-                std::unordered_map<BOARDSTATE, double> &transtable) ;
-
 struct TTABLE_ENTRY {
     double eval;
     std::vector<BOARDSTATE> pv;
     long int nodes;
 };
+
+int perft(Board b, int depth);
+std::vector<BOARDSTATE> minimax(BOARDSTATE start, int depth, ENGINEPARAMS params);
+std::vector<BOARDSTATE>
+minimax_caching(BOARDSTATE start, Engine engine, int depth,
+                std::unordered_map<BOARDSTATE, double> &transtable);
+
+TTABLE_ENTRY alphabeta(BOARDSTATE start, Engine engine, int depth, double alpha, double beta,
+                       std::unordered_map<BOARDSTATE, TTABLE_ENTRY> &transtable);
+
+
 #endif //CHECKERSENGINE_SEARCH_H
