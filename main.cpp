@@ -24,9 +24,9 @@ std::string printarray(char array[], int len){
 
 int main() {
     ENGINEPARAMS c1{11, 1};
-    ENGINEPARAMS c2{11, 1.5};
-    Engine p1{minimax_caching, materiel1, c1};
-    Engine p2{minimax_caching, materiel1, c2};
+    ENGINEPARAMS c2{11, 1};
+    Engine p1{minimax_caching, randomeval, c1};
+    Engine p2{minimax_caching, randomeval, c2};
     std::cout << std::to_string(c1.depth) << " " << std::to_string(c2.depth) << std::endl;
     rungame(p1, p2);
 //    Board b{};
@@ -42,19 +42,5 @@ int main() {
 //        std::cout << printstate(state) << state.eval << std::endl;
 //    }
 //    std::cout << perft(b, 12) << std::endl;
-//    std::cout << b.print() << std::endl;
-//    move(b.board, 2, 0, 1, 1);
-//    std::cout << b.print() << std::endl;
-//    move(b.board, 5, 1, 1, 0);
-//    std::cout << b.print() << std::endl;
-//    move(b.board, 2, 2, 1, 1);
-//    std::cout << b.print() << std::endl;
-//    std::cout << printarray(hasmoves(b.board, 3, 3), 4) << std::endl;
-//    move(b.board, 4, 2, 0, 0);
-//    std::cout << b.print() << std::endl;
-//    std::vector<BOARDSTATE> moves = b.legalmoves();
-//    for(BOARDSTATE s : moves){
-//        std::cout << printstate(s) << std::endl;
-//    }
     return 0;
 }

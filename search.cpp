@@ -20,8 +20,7 @@ int perft(Board b, int depth){
     int result = 0;
     std::vector<BOARDSTATE> moves = b.legalmoves();
     BOARDSTATE oldstate = b.board;
-    for(int i = 0; i < moves.size(); i++){
-        BOARDSTATE state = moves[i];
+    for (auto state : moves) {
         b.board = state;
         int val = perft(b, depth - 1);
         result += val;
@@ -33,7 +32,7 @@ int perft(Board b, int depth){
 std::vector<BOARDSTATE> minimax(BOARDSTATE start, int depth, ENGINEPARAMS params){
     std::vector<BOARDSTATE> pv;
     if(depth == 0){
-        start.eval = evaluate(start, params);
+        start.staticeval = evaluate(start, params);
         pv.insert(pv.begin(), start);
         return pv;
     }
@@ -45,7 +44,7 @@ std::vector<BOARDSTATE> minimax(BOARDSTATE start, int depth, ENGINEPARAMS params
     }
     for(BOARDSTATE state : moves){
         std::vector<BOARDSTATE> tmppv = minimax(state, depth - 1, params);
-        double val = tmppv.back().eval;
+        double val = tmppv.back().staticeval;
         if((val > best && !start.sidetomove) || (val < best && start.sidetomove)){
             best = val;
             bestpv = tmppv;
@@ -54,7 +53,7 @@ std::vector<BOARDSTATE> minimax(BOARDSTATE start, int depth, ENGINEPARAMS params
             tmppv.shrink_to_fit();
         }
     }
-    start.eval = evaluate(start, params);
+    start.staticeval = evaluate(start, params);
     bestpv.insert(bestpv.begin(), start);
     return bestpv;
 }
@@ -65,13 +64,13 @@ minimax_caching(BOARDSTATE start, Engine engine, int depth,
     std::vector<BOARDSTATE> pv;
     auto tableeval = transtable.find(start);
     if(tableeval != transtable.end()){
-        start.eval = tableeval->second;
+        start.staticeval = tableeval->second;
         pv.insert(pv.begin(), start);
         return pv;
     }
     if(depth == 0){
-        start.eval = engine.eval(start);
-        transtable.insert({start, start.eval});
+        start.staticeval = engine.eval(start);
+        transtable.insert({start, start.staticeval});
         pv.insert(pv.begin(), start);
         return pv;
     }
@@ -83,7 +82,7 @@ minimax_caching(BOARDSTATE start, Engine engine, int depth,
     }
     for(BOARDSTATE state : moves){
         std::vector<BOARDSTATE> tmppv = minimax_caching(state, engine, depth - 1, transtable);
-        double val = tmppv.back().eval;
+        double val = tmppv.back().staticeval;
         if((val > best && !start.sidetomove) || (val < best && start.sidetomove)){
             best = val;
             bestpv = tmppv;
@@ -93,14 +92,19 @@ minimax_caching(BOARDSTATE start, Engine engine, int depth,
         }
     }
     if(!bestpv.empty()){
-        transtable.insert({start, bestpv.back().eval});
+        transtable.insert({start, bestpv.back().staticeval});
     } else {
         transtable.insert({start, best});
     }
 
-    start.eval = engine.eval(start);
+    start.staticeval = engine.eval(start);
     bestpv.insert(bestpv.begin(), start);
     return bestpv;
+}
+
+TTABLE_ENTRY
+alphabeta(BOARDSTATE start, Engine engine, int depth, double alpha, double beta, std::unordered_map<BOARDSTATE, TTABLE_ENTRY> &transtable){
+
 }
 
 

@@ -18,4 +18,10 @@ std::vector<BOARDSTATE> minimax(BOARDSTATE start, int depth, ENGINEPARAMS params
 std::vector<BOARDSTATE>
 minimax_caching(BOARDSTATE start, Engine engine, int depth,
                 std::unordered_map<BOARDSTATE, double> &transtable) ;
+
+struct TTABLE_ENTRY {
+    double eval;
+    std::vector<BOARDSTATE> pv;
+    long int nodes;
+};
 #endif //CHECKERSENGINE_SEARCH_H

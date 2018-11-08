@@ -8,9 +8,9 @@
 #include "search.h"
 
 bool hasking(BOARDSTATE board){
-    for(int r = 0; r < 8; r++){
+    for (auto &r : board.board) {
         for(int c = 0; c < 8; c++){
-            if(board.board[r][c] == 2 || board.board[r][c] == 4){
+            if(r[c] == 2 || r[c] == 4){
                 return true;
             }
         }
@@ -19,9 +19,9 @@ bool hasking(BOARDSTATE board){
 }
 
 bool hasking(BOARDSTATE board, char side){
-    for(int r = 0; r < 8; r++){
+    for (auto &r : board.board) {
         for(int c = 0; c < 8; c++){
-            if(board.board[r][c] == side){
+            if(r[c] == side){
                 return true;
             }
         }
@@ -112,9 +112,9 @@ bool pieceonrank(BOARDSTATE board, char piece, char rank){
 std::vector<char> countpieces(BOARDSTATE board){
     std::vector<char> counts;
     counts.resize(6);
-    for(int r = 0; r < 8; r++){
+    for (auto &r : board.board) {
         for(int c = 0; c < 8; c++){
-            counts[board.board[r][c]]++;
+            counts[r[c]]++;
         }
     }
     return counts;

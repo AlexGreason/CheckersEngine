@@ -15,14 +15,16 @@ struct BOARDSTATE {
     int ply = 0; //starts at 0 before the first move and counts upwards
     char sidetomove = 0; //0=first player (black), 1=second player(red)
     char result = 0; //0=not terminal, 1=first player win, 2 = second player win, 3=draw
-    char board[8][8]; //0=empty, 1=black piece, 2=black king, 3=red piece, 4=red king
-    double eval = 0;
+    char board[8][8]{}; //0=empty, 1=black piece, 2=black king, 3=red piece, 4=red king
+    double staticeval = 0;
+    std::vector<double> searcheval;
     int nocaptureply = 0;
     inline bool operator==(const BOARDSTATE& other) const {
         // bool comparison = result of comparing 'this' to 'other'
         return equalstates_void((void*)this, (void*)&other);
     }
 };
+
 
 char move(BOARDSTATE &board, char r, char c, bool right, bool up);
 std::vector<char> hascaptures(BOARDSTATE board, char r, char c);
