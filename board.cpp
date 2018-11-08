@@ -365,7 +365,7 @@ std::vector<BOARDSTATE> legalmovesstate(BOARDSTATE &board) {
             char val = board.board[r][c];
             if(side[val] == board.sidetomove){
                 std::vector<BOARDSTATE> *piece = piecemoves(board, r, c, onlycaptures);
-                if(piece->empty()){
+                if(!piece->empty()){
                     moves.insert(moves.end(), piece->begin(), piece->end());
                 }
                 delete piece;
