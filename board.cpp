@@ -167,10 +167,6 @@ char getinbounds(char board[8][8], char r, char c){
     }
 }
 
-char move(BOARDSTATE &board, const char *inp_coords, bool up, bool right){
-    return move(board, inp_coords[0], inp_coords[1], up, right);
-}
-
 char move(BOARDSTATE &board, const char r, char c, bool up, bool right){
     // doesn't do bounds checking. try/except and have a return value for if successful?
     char promotions[6]{0, 2, 2, 4, 4, 5};

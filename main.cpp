@@ -39,7 +39,7 @@ int main() {
 //    std::vector<BOARDSTATE> pv;
     clock_t t;
     t = clock();
-    auto res = alphabeta(b.board, p1, 15, -10000, 10000, transtable);
+    auto res = alphabeta(b.board, p1, 17, -10000, 10000, transtable);
     t = clock() - t;
     std::cout << "Took " << std::to_string((float)t/(float)CLOCKS_PER_SEC) << " seconds" << std::endl;
     std::cout << std::to_string(transtable.size()) << std::endl;
