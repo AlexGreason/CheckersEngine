@@ -51,22 +51,6 @@ void Board::startpos() {
     }
 }
 
-void Board::testpos() {
-    char testpos[8][8] =  {{1, 0, 1, 0, 1, 0, 1, 0},
-                           {0, 1, 0, 1, 0, 1, 0, 1},
-                           {0, 0, 1, 0, 1, 0, 1, 0},
-                           {0, 0, 0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0, 0, 0},
-                           {0, 3, 0, 1, 0, 3, 0, 3},
-                           {3, 0, 3, 0, 3, 0, 3, 0},
-                           {0, 3, 0, 3, 0, 3, 0, 3}};
-
-    for(int r = 0; r < 8; r++){
-        for(int c = 0; c < 8; c++){
-            board.board[r][c] = testpos[r][c];
-        }
-    }
-}
 
 BOARDSTATE copy(BOARDSTATE board){
     BOARDSTATE result{};
@@ -206,7 +190,7 @@ char* hascaptures(BOARDSTATE board, char r, char c){
     char type[6] = {-1, 1, 2, 1, 2, -1};
     char offsets[3] = {2, 0, 0};
     char val = getinbounds(board.board, r, c);
-    char *captures = new char[4]{}; // up left, up right, back left, back right
+    auto *captures = new char[4]{}; // up left, up right, back left, back right
     char direction = directions[val];
 
     if(type[val] != -1 && direction != 0){ //piece, check only forwards
@@ -238,9 +222,6 @@ char* hascaptures(BOARDSTATE board, char r, char c){
 }
 
 char* hasmoves(BOARDSTATE board, char r, char c){
-    if(r < 0 || r >= 8 || c < 0 || c >= 8){
-        int blug = 3;
-    }
     char directions[6] = {0, 1, 1, -1, -1, 0};
     char type[6] = {-1, 1, 2, 1, 2, -1};
     char offsets[3] = {2, 0, 0};
@@ -273,11 +254,7 @@ char* hasmoves(BOARDSTATE board, char r, char c){
 std::vector<BOARDSTATE> capturetree(BOARDSTATE board, const char *inp_coords){
     char r = inp_coords[0];
     char c = inp_coords[1];
-    if(r < 0 || r >= 8 || c < 0 || c >= 8){
-        int blug = 3;
-    }
     std::vector<BOARDSTATE> result;
-    char rank[6]{0, 1, 2, 1, 2, 0};
     char *captures = hascaptures(board, r, c);
     bool anycaptures = false;
     for(int i = 0; i < 4; i++){
@@ -329,7 +306,7 @@ bool anycaptures(BOARDSTATE board){
 }
 
 std::vector<BOARDSTATE> *piecemoves(BOARDSTATE board, char r, char c, bool onlycaptures){
-    std::vector<BOARDSTATE> *result = new std::vector<BOARDSTATE>;
+    auto *result = new std::vector<BOARDSTATE>;
     if(!onlycaptures){
         char* moves;
         moves = hasmoves(board, r, c);
@@ -388,7 +365,7 @@ std::vector<BOARDSTATE> legalmovesstate(BOARDSTATE &board) {
             char val = board.board[r][c];
             if(side[val] == board.sidetomove){
                 std::vector<BOARDSTATE> *piece = piecemoves(board, r, c, onlycaptures);
-                if(piece->size() != 0){
+                if(piece->empty()){
                     moves.insert(moves.end(), piece->begin(), piece->end());
                 }
                 delete piece;

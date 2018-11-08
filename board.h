@@ -32,13 +32,6 @@ char* hasmoves(BOARDSTATE board, char r, char c);
 std::vector<BOARDSTATE> legalmovesstate(BOARDSTATE &board);
 bool equalstates(BOARDSTATE board1, BOARDSTATE board2);
 
-struct MOVE {
-    char startr;
-    char startc;
-    char endr;
-    char endc;
-};
-
 std::string printstate(BOARDSTATE board);
 
 class Board{
@@ -47,7 +40,6 @@ public:
     void startpos();
     std::string print();
     std::vector<BOARDSTATE> legalmoves();
-    void testpos();
 
 };
 
