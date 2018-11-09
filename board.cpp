@@ -78,9 +78,7 @@ bool equalstates_void(void* val1, void* val2){
     return equalstates(*(BOARDSTATE*) val1, *(BOARDSTATE*) val2);
 }
 
-char* coords(char r, char c, bool up, bool right, bool capture){
-    char* result;
-    result = new char[2];
+void coords(char r, char c, bool up, bool right, bool capture, char result[2]){
     if(!capture){
         result[0] = static_cast<char>(r - 1 + 2 * up);
         result[1] = static_cast<char>(c - 1 + 2 * right);
@@ -88,7 +86,6 @@ char* coords(char r, char c, bool up, bool right, bool capture){
         result[0] = static_cast<char>(r - 2 + 4 * up);
         result[1] = static_cast<char>(c - 2 + 4 * right);
     }
-    return result;
 }
 
 char getatcoords(char board[8][8], char r, char c, bool up, bool right, bool capture){
@@ -106,13 +103,12 @@ char getatcoords(char board[8][8], char r, char c, bool up, bool right, bool cap
     } else {
         return 5;
     }
+
 }
 
-char* coords(char r, char c, int i, bool capture){
+void coords(char r, char c, int i, bool capture, char result[2]){
     bool right = i % 2 != 0;
     bool up = !(i/2);
-    char* result;
-    result = new char[2];
     if(!capture){
         result[0] = static_cast<char>(r - 1 + 2 * up);
         result[1] = static_cast<char>(c - 1 + 2 * right);
@@ -120,7 +116,6 @@ char* coords(char r, char c, int i, bool capture){
         result[0] = static_cast<char>(r - 2 + 4 * up);
         result[1] = static_cast<char>(c - 2 + 4 * right);
     }
-    return result;
 }
 
 bool setinbounds(BOARDSTATE &board, const char* coords, char val){
@@ -157,8 +152,10 @@ char move(BOARDSTATE &board, const char r, char c, bool up, bool right){
     char starttype = board.board[r][c];
     char endtype = board.board[r][c];
     board.ply++;
-    char* coords_tmp = coords(r, c, up, right, false);
-    char* coords_cap = coords(r, c, up, right, true);
+    char coords_tmp[2]{0};
+    coords(r, c, up, right, false, coords_tmp);
+    char coords_cap[2]{0};
+    coords(r, c, up, right, true, coords_cap);
     if(getinbounds(board.board, coords_tmp) == 0) {
         if (coords_tmp[0] == 7 * up) {
             setinbounds(board, coords_tmp, promotions[board.board[r][c]]);
@@ -177,20 +174,17 @@ char move(BOARDSTATE &board, const char r, char c, bool up, bool right){
         setinbounds(board, coords_tmp, 0);
     }
     board.board[r][c] = 0;
-    delete [] coords_tmp;
-    delete [] coords_cap;
     return starttype != endtype; //return 1 if promoted
 }
 
 
 
-char* hascaptures(BOARDSTATE board, char r, char c){
+char* hascaptures(BOARDSTATE board, char r, char c, char* captures){
     //check forward two ("forwards" depends on piece type), then if king check backwards two
     char directions[6] = {0, 1, 1, -1, -1, 0};
     char type[6] = {-1, 1, 2, 1, 2, -1};
     char offsets[3] = {2, 0, 0};
     char val = getinbounds(board.board, r, c);
-    auto *captures = new char[4]{}; // up left, up right, back left, back right
     char direction = directions[val];
 
     if(type[val] != -1 && direction != 0){ //piece, check only forwards
@@ -221,13 +215,11 @@ char* hascaptures(BOARDSTATE board, char r, char c){
     return captures;
 }
 
-char* hasmoves(BOARDSTATE board, char r, char c){
+void hasmoves(BOARDSTATE board, char r, char c, char moves[4]){
     char directions[6] = {0, 1, 1, -1, -1, 0};
     char type[6] = {-1, 1, 2, 1, 2, -1};
     char offsets[3] = {2, 0, 0};
     char val = getinbounds(board.board, r, c);
-    char* moves; // up left, up right, back left, back right
-    moves = new char[4]{0, 0, 0, 0};
     char direction = directions[val];
 
     if(type[val] != -1 && direction != 0){ //piece, check only forwards
@@ -248,21 +240,20 @@ char* hasmoves(BOARDSTATE board, char r, char c){
             }
         }
     }
-    return moves;
 }
 
 std::vector<BOARDSTATE> capturetree(BOARDSTATE board, const char *inp_coords){
     char r = inp_coords[0];
     char c = inp_coords[1];
     std::vector<BOARDSTATE> result;
-    char *captures = hascaptures(board, r, c);
+    char captures[4]{0};
+    hascaptures(board, r, c, captures);
     bool anycaptures = false;
-    for(int i = 0; i < 4; i++){
-        anycaptures |= captures[i];
+    for (char capture : captures) {
+        anycaptures |= capture;
     }
     if(!anycaptures){
         result.push_back(board);
-        delete [] captures;
         return result;
     } else {
         for(int i = 0; i < 4; i++){
@@ -273,9 +264,9 @@ std::vector<BOARDSTATE> capturetree(BOARDSTATE board, const char *inp_coords){
                 bool promoted = move(tmp, r, c, up, right);
                 tmp.ply = board.ply;
                 if (!promoted) {
-                    char* newcoords = coords(r, c, i, true);
+                    char newcoords[2]{0};
+                    coords(r, c, i, true, newcoords);
                     std::vector<BOARDSTATE> tree = capturetree(tmp, newcoords);
-                    delete [] newcoords;
                     result.insert(result.end(), tree.begin(), tree.end());
                 } else {
                     result.push_back(tmp);
@@ -283,33 +274,34 @@ std::vector<BOARDSTATE> capturetree(BOARDSTATE board, const char *inp_coords){
             }
         }
     }
-    delete [] captures;
     return result;
 }
 
 bool anycaptures(BOARDSTATE board){
     int side[6] = {-1, 0, 0, 1, 1, -1};
     bool capture = false;
+    char caps[4];
     for(char r = 0; r < 8 && !capture; r++) {
         for (char c = 0; c < 8 && !capture; c++) {
             char val = board.board[r][c];
+            for (char &cap : caps) {
+                cap = 0;
+            }
             if (side[val] == board.sidetomove) {
-                char *caps = hascaptures(board, r, c);
-                for(int i = 0; i < 4; i++){
-                    capture |= caps[i];
+                hascaptures(board, r, c, caps);
+                for (char cap : caps) {
+                    capture |= cap;
                 }
-                delete [] caps;
             }
         }
     }
     return capture;
 }
 
-std::vector<BOARDSTATE> *piecemoves(BOARDSTATE board, char r, char c, bool onlycaptures){
-    auto *result = new std::vector<BOARDSTATE>;
+void piecemoves(BOARDSTATE board, char r, char c, bool onlycaptures, std::vector<BOARDSTATE> *result){
     if(!onlycaptures){
-        char* moves;
-        moves = hasmoves(board, r, c);
+        char moves[4]{0};
+        hasmoves(board, r, c, moves);
         for(int i = 0; i < 4; i++){
             if(moves[i]){
                 BOARDSTATE tmp = copy(board);
@@ -321,9 +313,9 @@ std::vector<BOARDSTATE> *piecemoves(BOARDSTATE board, char r, char c, bool onlyc
                 result->push_back(tmp);
             }
         }
-        delete [] moves;
     } else {
-        char *captures = hascaptures(board, r, c);
+        char captures[4]{0};
+        hascaptures(board, r, c, captures);
         for(int i = 0; i < 4; i++){
             if(captures[i]) {
                 BOARDSTATE tmp = copy(board);
@@ -332,9 +324,9 @@ std::vector<BOARDSTATE> *piecemoves(BOARDSTATE board, char r, char c, bool onlyc
                 bool up = !(i / 2);
                 bool promoted = move(tmp, r, c, up, right);
                 if (!promoted) {
-                    char* newcoords = coords(r, c, i, true);
+                    char newcoords[2]{0};
+                    coords(r, c, i, true, newcoords);
                     std::vector<BOARDSTATE> tree = capturetree(tmp, newcoords);
-                    delete [] newcoords;
                     for (BOARDSTATE b :tree) {
                         b.sidetomove = !b.sidetomove;
                         result->push_back(b);
@@ -346,9 +338,7 @@ std::vector<BOARDSTATE> *piecemoves(BOARDSTATE board, char r, char c, bool onlyc
                 }
             }
         }
-        delete [] captures;
     }
-    return result;
 }
 
 
@@ -364,11 +354,7 @@ std::vector<BOARDSTATE> legalmovesstate(BOARDSTATE &board) {
         for(char c = 0; c < 8; c++){
             char val = board.board[r][c];
             if(side[val] == board.sidetomove){
-                std::vector<BOARDSTATE> *piece = piecemoves(board, r, c, onlycaptures);
-                if(!piece->empty()){
-                    moves.insert(moves.end(), piece->begin(), piece->end());
-                }
-                delete piece;
+                piecemoves(board, r, c, onlycaptures, &moves);
             }
         }
     }
